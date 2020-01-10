@@ -7,9 +7,14 @@
           "id": 2,
           "clases": [
             {
-              "Nom": "Fonaments de la programació",
+              "Nom": "Programació OOP",
               "Aula": "TCM1-102",
               "Horari": "10:10-12"
+            },
+            {
+              "Nom": "Àlgebra",
+              "Aula": "TCM1-102",
+              "Horari": "12:10-14"
             }
           ]
         },
@@ -17,12 +22,12 @@
           "id": 3,
           "clases": [
             {
-              "Nom": "ANGLÉS",
+              "Nom": "Interacció P ORD",
               "Aula": "TCM1-102",
-              "Horari": "10:10-12"
+              "Horari": "9:00-12"
             },
             {
-              "Nom": "Emprenedoria",
+              "Nom": "Programació de micros",
               "Aula": "TCM1-102",
               "Horari": "12:10-14"
             }
@@ -32,12 +37,12 @@
           "id": 4,
           "clases": [
             {
-              "Nom": "Introducció als Coputadors",
+              "Nom": "Programació de micros",
               "Aula": "TCM1-lab-INF-1",
               "Horari": "8:00-9:50"
             },
             {
-              "Nom": "Introducció als Coputadors",
+              "Nom": "Àlgebra",
               "Aula": "TCM1-102",
               "Horari": "10:10-12:00"
             }
@@ -47,14 +52,9 @@
           "id": 5,
           "clases": [
             {
-              "Nom": "ANGLÉS",
+              "Nom": "Programació OOP",
               "Aula": "TCM1-102",
               "Horari": "10:10-12"
-            },
-            {
-              "Nom": "Emprenedoria",
-              "Aula": "TCM1-102",
-              "Horari": "12:10-14"
             }
           ]
         },
@@ -62,18 +62,13 @@
           "id": 6,
           "clases": [
             {
-              "Nom": "Fonaments de la programació",
-              "Aula": "TCM1-lab-inf-3",
-              "Horari": "8:00-9:50"
-            },
-            {
-              "Nom": "Fonaments de la programació",
+              "Nom": "Àlgebra",
               "Aula": "TCM1-102",
               "Horari": "10:10-12"
             },
             {
-              "Nom": "Introducció als computadors",
-              "Aula": "TCM1-102",
+              "Nom": "Programació OOP",
+              "Aula": "TCM1-lab INF 1",
               "Horari": "12:10-14"
             }
           ]
@@ -87,9 +82,14 @@
           "id": 2,
           "clases": [
             {
-              "Nom": "Fonaments de la programació",
+              "Nom": "Programació OOP",
               "Aula": "TCM1-102",
               "Horari": "10:10-12"
+            },
+            {
+              "Nom": "Àlgebra",
+              "Aula": "TCM1-102",
+              "Horari": "12:10-14"
             }
           ]
         },
@@ -97,12 +97,12 @@
           "id": 3,
           "clases": [
             {
-              "Nom": "ANGLÉS",
+              "Nom": "Interacció P ORD",
               "Aula": "TCM1-102",
-              "Horari": "10:10-12"
+              "Horari": "9:00-12"
             },
             {
-              "Nom": "Emprenedoria",
+              "Nom": "Programació de micros",
               "Aula": "TCM1-102",
               "Horari": "12:10-14"
             }
@@ -112,14 +112,14 @@
           "id": 4,
           "clases": [
             {
-              "Nom": "Introducció als Coputadors",
-              "Aula": "TCM1-lab-INF-1",
-              "Horari": "8:00-9:50"
-            },
-            {
-              "Nom": "Introducció als Coputadors",
+              "Nom": "Àlgebra",
               "Aula": "TCM1-102",
               "Horari": "10:10-12:00"
+            },
+            {
+              "Nom": "Interacció P ORD",
+              "Aula": "TCM1-lab-INF-1",
+              "Horari": "12:10-14"
             }
           ]
         },
@@ -127,14 +127,14 @@
           "id": 5,
           "clases": [
             {
-              "Nom": "ANGLÉS",
+              "Nom": "Programació OOP",
               "Aula": "TCM1-102",
               "Horari": "10:10-12"
             },
             {
-              "Nom": "Emprenedoria",
-              "Aula": "TCM1-102",
-              "Horari": "12:10-14"
+              "Nom": "Programació de micros",
+              "Aula": "TCM1-lab-INF-1",
+              "Horari": "12:10-14:00"
             }
           ]
         },
@@ -142,18 +142,13 @@
           "id": 6,
           "clases": [
             {
-              "Nom": "Fonaments de la programació",
-              "Aula": "TCM1-lab-inf-3",
-              "Horari": "8:00-9:50"
-            },
-            {
-              "Nom": "Fonaments de la programació",
+              "Nom": "Àlgebra",
               "Aula": "TCM1-102",
               "Horari": "10:10-12"
             },
             {
-              "Nom": "Introducció als computadors",
-              "Aula": "TCM1-102",
+              "Nom": "Programació OOP",
+              "Aula": "TCM1-lab INF 1",
               "Horari": "12:10-14"
             }
           ]
