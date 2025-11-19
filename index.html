@@ -1,1 +1,327 @@
-Hello World
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Turbo Track: Director's Cut</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script type="module" crossorigin src="/assets/index-i_I-UdxW.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-i1TKqbRW.css">
+</head>
+<body class="h-screen w-full flex flex-col relative overflow-hidden">
+
+    <!-- WEATHER LAYER -->
+    <canvas id="weather-canvas" class="absolute inset-0 z-10 pointer-events-none opacity-0 transition-opacity duration-1000"></canvas>
+
+    <!-- HUD SUPERIOR (REDSEÑADO) -->
+    <div id="main-hud" class="absolute top-0 left-0 w-full z-30 p-4 pointer-events-none flex justify-between items-start">
+        
+        <!-- Stats & Money: Tarjeta de Cristal Flotante -->
+        <div class="glass-panel rounded-2xl p-2 pr-5 flex items-center gap-3 pointer-events-auto animate-float shadow-[0_0_20px_rgba(16,185,129,0.2)] border border-emerald-500/20 backdrop-blur-xl transition-transform hover:scale-105">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/40 text-slate-900 transform -rotate-3 border border-emerald-300">
+                <i class="fas fa-dollar-sign text-2xl font-black"></i>
+            </div>
+            <div class="flex flex-col">
+                <p class="text-[10px] text-emerald-400 font-black uppercase tracking-[0.15em] mb-0.5 shadow-emerald-500/50">Fondos</p>
+                <h1 id="money-display" class="text-2xl font-black text-white tracking-tight drop-shadow-md font-mono">0</h1>
+            </div>
+        </div>
+
+        <!-- Right Controls Group -->
+        <div class="flex flex-col items-end gap-3 pointer-events-auto">
+            
+            <!-- Weather Widget (Floating Pill) -->
+            <div id="weather-badge" class="hidden md:flex items-center gap-3 bg-slate-900/80 px-4 py-2 rounded-full border border-white/10 backdrop-blur-md shadow-lg transition-all duration-500 hover:bg-slate-800 hover:border-blue-400/50 group">
+                <div class="relative">
+                    <div class="absolute inset-0 bg-yellow-400/20 blur-md rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <i class="fas fa-sun text-yellow-400 text-lg animate-spin-slow relative z-10" id="weather-icon"></i>
+                </div>
+                <span class="text-xs font-bold text-slate-300 tracking-wider group-hover:text-white transition-colors" id="weather-text">SOLEADO</span>
+            </div>
+
+            <!-- Action Buttons (Botones Circulares Neumórficos) -->
+            <div class="flex gap-3">
+                
+                <!-- Mechanic Button (Siempre visible) -->
+                <button onclick="game.mechanicSystem.toggleMechanic()" id="btn-mechanic" class="group relative w-14 h-14 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 border-2 border-blue-400/50 flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.6)] hover:shadow-[0_0_30px_rgba(59,130,246,0.8)] transition-all hover:scale-110 overflow-hidden opacity-50" title="Mecánico Automático (2h)">
+                    <i class="fas fa-tools text-white text-xl group-hover:rotate-90 transition-transform duration-500"></i>
+                    <div class="absolute bottom-0 left-0 right-0 h-1.5 bg-blue-900/50">
+                        <div id="mechanic-bar" class="h-full bg-blue-300 w-0 transition-all duration-100"></div>
+                    </div>
+                    <!-- Indicador de activo -->
+                    <div class="absolute top-1 right-1 w-2 h-2 bg-green-400 rounded-full opacity-0 transition-opacity" id="mechanic-indicator"></div>
+                </button>
+
+                <!-- Boost Button (Siempre visible) -->
+                <button onclick="game.showAd('speed')" id="btn-boost" class="group relative w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 border border-white/20 flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.5)] hover:scale-110 transition-all overflow-hidden animate-pulse" title="x2 Velocidad">
+                    <div class="absolute inset-0 bg-white/20 skew-x-12 -translate-x-full group-hover:animate-[shine_1s_infinite]"></div>
+                    <i class="fas fa-bolt text-white text-xl drop-shadow-md"></i>
+                </button>
+
+                <!-- Botón Ranking (Siempre visible en móvil, colapsable) -->
+                <button onclick="game.toggleLeaderboard()" id="btn-ranking-mobile" class="md:hidden group relative w-12 h-12 rounded-full bg-slate-800/90 border border-white/10 flex items-center justify-center shadow-lg hover:shadow-yellow-500/50 transition-all hover:scale-110 hover:bg-yellow-500 overflow-hidden" title="Ranking">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <i class="fas fa-trophy text-yellow-500/80 group-hover:text-white group-hover:animate-bounce transition-colors"></i>
+                </button>
+
+                <!-- Toggle para más opciones (Solo móvil) -->
+                <button onclick="game.toggleMobileMenu()" id="btn-mobile-menu" class="md:hidden group relative w-12 h-12 rounded-full bg-slate-800/90 border border-white/10 flex items-center justify-center shadow-lg hover:shadow-purple-500/50 transition-all hover:scale-110 hover:bg-purple-600 overflow-hidden" title="Más opciones">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <i class="fas fa-ellipsis-v text-slate-300 group-hover:text-white transition-transform"></i>
+                </button>
+
+                <!-- Botones secundarios (Ocultos en móvil, visibles en desktop) -->
+                <div id="secondary-buttons" class="hidden md:flex gap-3">
+                    <!-- Botón Editar -->
+                    <button onclick="game.startDrawingMode()" class="group relative w-12 h-12 rounded-full bg-slate-800/90 border border-white/10 flex items-center justify-center shadow-lg hover:shadow-blue-500/50 transition-all hover:scale-110 hover:bg-blue-600 overflow-hidden" title="Editar Pista">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <i class="fas fa-pencil-alt text-slate-300 group-hover:text-white group-hover:rotate-12 transition-transform"></i>
+                    </button>
+                    
+                    <!-- Botón Ranking (Desktop) -->
+                    <button onclick="game.toggleLeaderboard()" class="group relative w-12 h-12 rounded-full bg-slate-800/90 border border-white/10 flex items-center justify-center shadow-lg hover:shadow-yellow-500/50 transition-all hover:scale-110 hover:bg-yellow-500 overflow-hidden" title="Ranking">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <i class="fas fa-trophy text-yellow-500/80 group-hover:text-white group-hover:animate-bounce transition-colors"></i>
+                    </button>
+
+                    <!-- Botón Info Circuito -->
+                    <button onclick="game.toggleTrackInfo()" class="group relative w-12 h-12 rounded-full bg-slate-800/90 border border-white/10 flex items-center justify-center shadow-lg hover:shadow-indigo-500/50 transition-all hover:scale-110 hover:bg-indigo-600 overflow-hidden" title="Info Circuito">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <i class="fas fa-info-circle text-indigo-400 group-hover:text-white transition-colors"></i>
+                    </button>
+                    
+                    <!-- Botón Ajustes -->
+                    <button onclick="game.toggleSettings()" class="group relative w-12 h-12 rounded-full bg-slate-800/90 border border-white/10 flex items-center justify-center shadow-lg hover:shadow-purple-500/50 transition-all hover:scale-110 hover:bg-purple-600 overflow-hidden" title="Ajustes">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <i class="fas fa-cog text-slate-300 group-hover:text-white group-hover:rotate-90 transition-transform duration-700"></i>
+                    </button>
+
+                    <!-- Botón Ayuda (Tutorial) -->
+                    <button onclick="game.tutorialSystem.start()" class="group relative w-12 h-12 rounded-full bg-slate-800/90 border border-white/10 flex items-center justify-center shadow-lg hover:shadow-emerald-500/50 transition-all hover:scale-110 hover:bg-emerald-600 overflow-hidden" title="Ayuda / Tutorial">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <i class="fas fa-question text-slate-300 group-hover:text-white transition-transform"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Menú móvil expandible (Colapsable) -->
+            <div id="mobile-menu" class="md:hidden absolute top-full right-0 mt-2 bg-slate-900/95 backdrop-blur-xl border border-slate-700 rounded-xl shadow-2xl p-3 hidden flex-col gap-2 pointer-events-auto z-50">
+                <button onclick="game.startDrawingMode(); game.toggleMobileMenu();" class="group relative w-12 h-12 rounded-full bg-slate-800/90 border border-white/10 flex items-center justify-center shadow-lg hover:shadow-blue-500/50 transition-all hover:scale-110 hover:bg-blue-600 overflow-hidden" title="Editar Pista">
+                    <i class="fas fa-pencil-alt text-slate-300 group-hover:text-white"></i>
+                </button>
+                <button onclick="game.toggleTrackInfo(); game.toggleMobileMenu();" class="group relative w-12 h-12 rounded-full bg-slate-800/90 border border-white/10 flex items-center justify-center shadow-lg hover:shadow-indigo-500/50 transition-all hover:scale-110 hover:bg-indigo-600 overflow-hidden" title="Info Circuito">
+                    <i class="fas fa-info-circle text-indigo-400 group-hover:text-white"></i>
+                </button>
+                <button onclick="game.toggleSettings(); game.toggleMobileMenu();" class="group relative w-12 h-12 rounded-full bg-slate-800/90 border border-white/10 flex items-center justify-center shadow-lg hover:shadow-purple-500/50 transition-all hover:scale-110 hover:bg-purple-600 overflow-hidden" title="Ajustes">
+                    <i class="fas fa-cog text-slate-300 group-hover:text-white"></i>
+                </button>
+                <button onclick="game.tutorialSystem.start(); game.toggleMobileMenu();" class="group relative w-12 h-12 rounded-full bg-slate-800/90 border border-white/10 flex items-center justify-center shadow-lg hover:shadow-emerald-500/50 transition-all hover:scale-110 hover:bg-emerald-600 overflow-hidden" title="Ayuda">
+                    <i class="fas fa-question text-slate-300 group-hover:text-white"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LEADERBOARD (Right) -->
+    <div id="leaderboard-panel" class="absolute top-24 right-2 w-64 glass-panel rounded-xl border-l border-slate-600 shadow-2xl z-20 hidden flex flex-col max-h-[50vh] transition-transform origin-top-right scale-100">
+        <div class="flex border-b border-slate-700">
+            <button onclick="game.switchLeaderboard('global')" id="tab-global" class="flex-1 py-2 text-[10px] font-bold text-white bg-blue-600/20">GLOBAL</button>
+            <button onclick="game.switchLeaderboard('friends')" id="tab-friends" class="flex-1 py-2 text-[10px] font-bold text-slate-500 hover:text-white">AMIGOS</button>
+        </div>
+        <div id="leaderboard-list" class="overflow-y-auto flex-grow p-2 space-y-1 no-scrollbar"></div>
+        <div class="p-2 bg-slate-900/50 border-t border-slate-700 text-xs flex justify-between font-bold">
+            <span class="text-slate-400">Tu Rank:</span>
+            <span class="text-yellow-400" id="player-rank-display">#--</span>
+        </div>
+    </div>
+
+    <!-- GAME AREA -->
+    <div class="relative flex-grow bg-slate-900 overflow-hidden touch-none" id="game-container">
+        <canvas id="gameCanvas" class="absolute top-0 left-0 w-full h-full cursor-crosshair"></canvas>
+        <div id="interactive-layer" class="absolute inset-0 z-10 pointer-events-none"></div>
+
+        <!-- Draw Overlay: IMPORTANT z-40 but pointer-events-none so clicks pass to canvas -->
+        <!-- Cuando está oculto, no bloquea nada. Cuando está visible, bloquea clics al canvas pero permite botones -->
+        <div id="drawing-overlay" class="absolute inset-0 z-40 flex flex-col items-center justify-center text-center p-6 bg-slate-900/95 transition-opacity duration-500 pointer-events-none">
+            
+            <div id="drawing-instructions" class="pointer-events-none transition-opacity duration-300">
+                <div class="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                    <i class="fas fa-fingerprint text-5xl text-blue-500"></i>
+                </div>
+                <h2 class="text-4xl font-black text-white mb-2 tracking-tight">TRAZA LA RUTA</h2>
+                <p class="text-slate-400 mb-4 max-w-xs mx-auto leading-relaxed">Dibuja un circuito cerrado. <br><span class="text-blue-400">Curvas amplias = Más velocidad.</span></p>
+            </div>
+
+            <!-- Track Stats Display (Moved outside drawing-instructions to stay visible) -->
+            <div id="track-stats" class="bg-slate-800/80 backdrop-blur px-4 py-2 rounded-lg border border-slate-700 inline-block mb-6 opacity-0 transition-opacity pointer-events-auto">
+                <div class="text-xs text-slate-400 uppercase font-bold">Longitud</div>
+                <div class="text-xl font-mono font-bold text-white"><span id="track-length">0</span>m</div>
+                <div class="text-[10px] text-emerald-400 mt-1">Capacidad: <span id="track-capacity">0</span> estructuras</div>
+            </div>
+
+            <!-- Buttons must capture pointer events -->
+            <div class="flex gap-4 pointer-events-auto">
+                <button id="finish-draw-btn" onclick="game.finalizeTrack()" class="hidden bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-blue-600/30 tracking-wider transform transition hover:-translate-y-1 pointer-events-auto">¡COMPETIR!</button>
+                <button onclick="game.clearTrack()" id="clear-draw-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-6 py-4 rounded-2xl font-bold border border-slate-700 pointer-events-auto">Borrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM PANEL: GARAGE & MARKET -->
+    <div class="glass-panel h-[38vh] min-h-[280px] flex flex-col z-30 border-t border-slate-700 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] transition-all" id="bottom-panel">
+        
+        <!-- Header Tabs -->
+        <div class="flex items-center border-b border-slate-700/50 px-4 pt-2 gap-4 bg-slate-900/40">
+            <button onclick="game.setTab('garage')" id="btn-tab-garage" class="pb-2 text-sm font-bold border-b-2 border-blue-500 text-white transition-colors">
+                <i class="fas fa-warehouse mr-2"></i> GARAJE
+            </button>
+            <button onclick="game.setTab('market')" id="btn-tab-market" class="pb-2 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-white transition-colors">
+                <i class="fas fa-shopping-cart mr-2"></i> CONCESIONARIO
+            </button>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-grow relative overflow-hidden">
+            
+            <!-- VIEW 1: GARAGE GRID -->
+            <div id="view-garage" class="absolute inset-0 p-4 overflow-y-auto no-scrollbar">
+                <div id="garage-grid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3 pb-20">
+                    <!-- Slots injected via JS -->
+                </div>
+            </div>
+
+            <!-- VIEW 2: MARKET -->
+            <div id="view-market" class="absolute inset-0 p-4 overflow-y-auto no-scrollbar hidden bg-slate-900/50">
+                <div id="market-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 pb-20">
+                    <!-- Market Items injected via JS -->
+                </div>
+            </div>
+
+            <!-- CONTEXT PANEL (Overlay at bottom when car selected) -->
+            <div id="car-inspector" class="absolute bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-600 p-4 transform translate-y-full transition-transform duration-300 shadow-2xl flex flex-col sm:flex-row items-center gap-4 z-20">
+                
+                <!-- Selected Car Info -->
+                <div class="flex items-center gap-4 min-w-[140px]">
+                    <div class="w-16 h-16 bg-slate-700 rounded-xl flex items-center justify-center text-3xl shadow-inner" id="inspector-icon">🏎️</div>
+                    <div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider" id="inspector-class">CLASE C</div>
+                        <div class="text-xl font-black text-white leading-none">Nivel <span id="inspector-level">1</span></div>
+                    </div>
+                </div>
+
+                <!-- Actions Grid -->
+                <div class="flex-grow grid grid-cols-2 gap-3 w-full sm:w-auto">
+                    <!-- Upgrade Engine -->
+                    <button onclick="game.upgradeSelectedCar('engine')" class="bg-slate-700 hover:bg-slate-600 p-2 rounded-lg border border-slate-600 flex flex-col items-center relative group btn-push" title="Mejora la Velocidad Punta">
+                        <div class="text-[10px] text-orange-400 font-bold uppercase mb-1"><i class="fas fa-tachometer-alt mr-1"></i> Motor</div>
+                        <div class="text-white font-bold" id="insp-eng-val">Lv. 0</div>
+                        <div class="text-xs text-green-400 font-mono bg-slate-800 px-2 rounded mt-1 border border-green-500/30" id="insp-eng-cost">$50</div>
+                    </button>
+                    
+                    <!-- Upgrade Tires -->
+                    <button onclick="game.upgradeSelectedCar('tires')" class="bg-slate-700 hover:bg-slate-600 p-2 rounded-lg border border-slate-600 flex flex-col items-center relative group btn-push" title="Mejora el Agarre en Curvas">
+                        <div class="text-[10px] text-blue-400 font-bold uppercase mb-1"><i class="fas fa-circle-notch mr-1"></i> Agarre</div>
+                        <div class="text-white font-bold" id="insp-tire-val">Lv. 0</div>
+                        <div class="text-xs text-green-400 font-mono bg-slate-800 px-2 rounded mt-1 border border-green-500/30" id="insp-tire-cost">$50</div>
+                    </button>
+                </div>
+
+                <!-- STRATEGY SECTION -->
+                <div class="flex flex-col gap-2 min-w-[120px] border-l border-slate-700 pl-4">
+                    <div>
+                        <label class="text-[9px] text-slate-400 uppercase font-bold block mb-1">Neumáticos</label>
+                        <select id="inspector-compound" onchange="game.setCarCompound(this.value)" class="w-full bg-slate-900 text-white text-xs p-1 rounded border border-slate-600 focus:border-blue-500 outline-none">
+                            <option value="MEDIUM">Medios</option>
+                            <option value="SOFT">Blandos</option>
+                            <option value="HARD">Duros</option>
+                            <option value="WET">Lluvia</option>
+                        </select>
+                        <div id="inspector-compound-desc" class="text-[9px] text-slate-400 leading-tight mt-1 min-h-[24px]"></div>
+                    </div>
+                    <div>
+                        <label class="text-[9px] text-slate-400 uppercase font-bold block mb-1">Rol</label>
+                        <select id="inspector-role" onchange="game.setCarRole(this.value)" class="w-full bg-slate-900 text-white text-xs p-1 rounded border border-slate-600 focus:border-blue-500 outline-none">
+                            <option value="NONE">Sin Rol</option>
+                            <option value="LEADER">Líder</option>
+                            <option value="MECHANIC">Mecánico</option>
+                            <option value="TREASURER">Tesorero</option>
+                        </select>
+                        <div id="inspector-role-desc" class="text-[9px] text-slate-400 leading-tight mt-1 min-h-[24px]"></div>
+                    </div>
+                </div>
+
+                <!-- Close / Sell -->
+                <div class="flex flex-col gap-2 min-w-[80px]">
+                    <button onclick="game.deselectSlot()" class="text-xs text-slate-400 hover:text-white underline">Cerrar</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div id="track-info-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4 pointer-events-auto">
+        <div class="bg-slate-800 w-full max-w-xs rounded-2xl border border-slate-600 shadow-2xl p-5">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-2">
+                <h3 class="font-bold text-white flex items-center gap-2"><i class="fas fa-route text-blue-500"></i> Datos del Circuito</h3>
+                <button onclick="game.toggleTrackInfo()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div class="bg-slate-900/50 p-3 rounded-lg">
+                    <div class="text-xs text-slate-400 uppercase font-bold mb-1">Longitud Total</div>
+                    <div class="text-2xl font-mono font-black text-white" id="info-length">0m</div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-slate-900/50 p-3 rounded-lg">
+                        <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Estructuras</div>
+                        <div class="text-lg font-mono font-bold text-emerald-400" id="info-capacity">0/0</div>
+                    </div>
+                    <div class="bg-slate-900/50 p-3 rounded-lg">
+                        <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Técnica</div>
+                        <div class="text-lg font-mono font-bold text-yellow-400" id="info-technique">Baja</div>
+                    </div>
+                </div>
+                <div class="bg-slate-900/50 p-3 rounded-lg">
+                    <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Recta más larga</div>
+                    <div class="text-lg font-mono font-bold text-blue-400" id="info-straight">0m</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sponsors-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4 pointer-events-auto">
+        <div class="bg-slate-800 w-full max-w-md rounded-2xl border border-slate-600 shadow-2xl flex flex-col max-h-[80vh]">
+            <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900/50 rounded-t-2xl">
+                <h3 class="font-bold text-white flex items-center gap-2"><i class="fas fa-handshake text-yellow-500"></i> Patrocinadores</h3>
+                <button onclick="game.toggleSponsors()" class="text-slate-400 hover:text-white transition-colors"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div id="sponsors-list" class="p-4 overflow-y-auto space-y-3">
+                <!-- Sponsors injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4 pointer-events-auto">
+        <div class="bg-slate-800 w-full max-w-xs rounded-2xl border border-slate-600 shadow-2xl p-5">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-white">Ajustes</h3>
+                <button onclick="game.toggleSettings()" class="text-slate-400"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div><label class="text-xs text-slate-400">Prob. Averías</label><input type="range" class="w-full mt-1" oninput="game.config.breakdownChance = this.value/10000"></div>
+                <div><label class="text-xs text-slate-400">Sensibilidad Curvas</label><input type="range" class="w-full mt-1" min="1" max="10" value="4" oninput="game.config.curveSensitivity = this.value"></div>
+                <div><label class="text-xs text-slate-400">Tiempo Reparación Mecánico (s)</label><input type="range" class="w-full mt-1" min="20" max="30" value="25" oninput="game.mechanicSystem.repairDuration = this.value*1000; document.getElementById('repair-time-display').innerText = this.value"></div>
+                <p class="text-xs text-slate-500 text-center">Tiempo actual: <span id="repair-time-display">25</span>s</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="ad-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col items-center justify-center">
+        <i class="fas fa-tools text-5xl text-red-500 mb-4 animate-bounce"></i>
+        <h2 class="text-xl font-bold text-white">Reparando...</h2>
+        <div class="w-48 h-1 bg-slate-700 mt-4 rounded"><div id="ad-bar" class="h-full bg-red-500 w-0 transition-all duration-1000"></div></div>
+    </div>
+
+    <!-- Vite entry point -->
+</body>
+</html>
