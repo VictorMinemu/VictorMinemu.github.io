@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Generador de Iconos PWA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@900&display=swap');
+        body { font-family: 'Exo 2', sans-serif; background-color: #0f172a; color: white; }
+        canvas { border: 1px solid #334155; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-8 gap-8">
+    
+    <div class="text-center">
+        <h1 class="text-3xl font-bold mb-2 text-blue-400">Generador de Iconos Turbo Track</h1>
+        <p class="text-slate-400">Pulsa los botones para descargar los iconos necesarios.</p>
+    </div>
+
+    <div class="relative group">
+        <!-- Canvas oculto para renderizado -->
+        <canvas id="iconCanvas" width="1024" height="1024" class="w-64 h-64"></canvas>
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span class="text-xs text-slate-500 font-mono mt-72">Vista Previa (Escalada)</span>
+        </div>
+    </div>
+
+    <div class="flex gap-4 flex-wrap justify-center">
+        <button onclick="downloadIcon(192, 'pwa-192x192.png')" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold transition shadow-lg shadow-blue-600/20 flex items-center gap-2">
+            <i class="fas fa-download"></i> 192x192
+        </button>
+        <button onclick="downloadIcon(512, 'pwa-512x512.png')" class="bg-purple-600 hover:bg-purple-500 text-white px-6 py-3 rounded-xl font-bold transition shadow-lg shadow-purple-600/20 flex items-center gap-2">
+            <i class="fas fa-download"></i> 512x512
+        </button>
+        <button onclick="downloadIcon(180, 'apple-touch-icon.png')" class="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-xl font-bold transition shadow-lg flex items-center gap-2">
+            <i class="fas fa-apple"></i> iOS Icon
+        </button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('iconCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Cargar fuente antes de dibujar
+        document.fonts.ready.then(() => {
+            drawIcon();
+        });
+
+        function drawIcon() {
+            const size = 1024;
+            const center = size / 2;
+
+            // 1. Fondo Gradiente
+            const grad = ctx.createLinearGradient(0, 0, size, size);
+            grad.addColorStop(0, '#1e293b');
+            grad.addColorStop(1, '#0f172a');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, size, size);
+
+            // 2. Círculo decorativo (Glow)
+            ctx.beginPath();
+            ctx.arc(center, center, size * 0.4, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(59, 130, 246, 0.1)';
+            ctx.fill();
+
+            // 3. Texto "TT" (Logo simplificado)
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '900 500px "Exo 2"';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(59, 130, 246, 0.8)';
+            ctx.shadowBlur = 50;
+            ctx.fillText('TT', center, center);
+
+            // 4. Borde (Opcional, bueno para iconos squircle)
+            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.lineWidth = 20;
+            ctx.strokeRect(0, 0, size, size);
+        }
+
+        function downloadIcon(resizeTo, filename) {
+            // Crear un canvas temporal del tamaño deseado
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = resizeTo;
+            tempCanvas.height = resizeTo;
+            const tempCtx = tempCanvas.getContext('2d');
+
+            // Dibujar el canvas original escalado
+            tempCtx.drawImage(canvas, 0, 0, resizeTo, resizeTo);
+
+            // Descargar
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = tempCanvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+</html>
